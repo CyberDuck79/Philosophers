@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/20 13:18:58 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/04/23 10:03:33 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/10/16 14:27:19 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,28 @@
 #include "string.h"
 
 int				g_at_table;
+t_mutex			g_at_table_mtx;
+t_mutex			g_end_mtx;
 
-t_time			get_time(void)
+time_t			get_time(void)
 {
-	struct timeval tv;
+	struct timeval	tv;
 
 	gettimeofday(&tv, NULL);
 	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
+}
+
+int				update_time(time_t *last_time)
+{
+	struct timeval	tv;
+	time_t			curr_time;
+
+	gettimeofday(&tv, NULL);
+	curr_time = (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+	if (*last_time == curr_time)
+		return (0);
+	*last_time = curr_time;
+	return (1);
 }
 
 char			*nb_to_str(unsigned long nb)
@@ -63,37 +78,35 @@ void			time_to_str(char *buf, t_time time)
 	}
 }
 
-void			print_state(t_print *print, t_state state)
+void			print_state(t_print *print, t_state state, int at_table)
 {
 	static time_t	time;
 	static char		time_str[15];
 
+	pthread_mutex_unlock(&g_at_table_mtx);
 	pthread_mutex_lock(print->print_mtx);
-	if (time != get_time())
-	{
-		time = get_time();
+	if (update_time(&time))
 		time_to_str(time_str, time);
-	}
 	write(STDOUT, time_str, 15);
 	write(STDOUT, print->nb, print->nb_len);
 	write(STDOUT, print->str[state], print->str_len[state]);
-	if (state != DIED)
+	if (at_table > 0)
 		pthread_mutex_unlock(print->print_mtx);
 }
 
 void			take_forks_and_eat(t_philo *philo)
 {
 	pthread_mutex_lock(philo->fork[FIRST]);
-	print_state(&philo->print, TAKING);
+	print_state(&philo->print, TAKING, g_at_table);
 	pthread_mutex_lock(philo->fork[SECOND]);
-	print_state(&philo->print, TAKING);
+	print_state(&philo->print, TAKING, g_at_table);
 	pthread_mutex_lock(philo->eating_mtx);
 	philo->last_eat_time = get_time();
 	pthread_mutex_unlock(philo->eating_mtx);
-	print_state(&philo->print, EATING);
+	print_state(&philo->print, EATING, g_at_table);
 	usleep(philo->params->time_to_eat);
-	pthread_mutex_unlock(philo->fork[SECOND]);
 	pthread_mutex_unlock(philo->fork[FIRST]);
+	pthread_mutex_unlock(philo->fork[SECOND]);
 }
 
 void			*philosophing(void *data)
@@ -108,19 +121,19 @@ void			*philosophing(void *data)
 	meal = 0;
 	while (1)
 	{
-		print_state(&philo->print, THINKING);
+		print_state(&philo->print, THINKING, g_at_table);
 		take_forks_and_eat(philo);
-		if (philo->params->must_eat_nb && ++meal == philo->params->must_eat_nb)
+		if (++meal == philo->params->must_eat_nb)
 		{
-			print_state(&philo->print, DONE);
-			pthread_mutex_lock(philo->at_table_mtx);
+			pthread_mutex_lock(&g_at_table_mtx);
 			g_at_table--;
-			pthread_mutex_unlock(philo->at_table_mtx);
+			print_state(&philo->print, DONE, g_at_table);
 			break;
 		}
-		print_state(&philo->print, SLEEPING);
+		print_state(&philo->print, SLEEPING, g_at_table);
 		usleep(philo->params->time_to_sleep);
 	}
+	pthread_mutex_lock(&g_end_mtx);
 	return (NULL);
 }
 
@@ -162,19 +175,19 @@ void			*monitoring(void *data)
 		i = 0;
 		while (i < p->params->philo_nb)
 		{
-			//pthread_mutex_lock(p[i].eating_mtx);
+			pthread_mutex_lock(p[i].eating_mtx);
 			if (get_time() - p[i].last_eat_time > p->params->time_to_die)
 			{
-				print_state(&p[i].print, DIED);
-				pthread_mutex_lock(p->at_table_mtx);
+				pthread_mutex_lock(&g_at_table_mtx);
 				g_at_table = 0;
-				pthread_mutex_unlock(p->at_table_mtx);
+				print_state(&p[i].print, DIED, g_at_table);
+				pthread_mutex_lock(&g_end_mtx);
 				return (NULL);
 			}
-			//pthread_mutex_unlock(p[i].eating_mtx);
+			pthread_mutex_unlock(p[i].eating_mtx);
 			i++;
 		}
-		usleep(1);
+		usleep(100);
 	}
 	return (NULL);
 }
@@ -218,13 +231,13 @@ t_error			philo_init(int philo_nb, t_data *data, const t_params *params)
 	i = 0;
 	while (i < philo_nb)
 	{
-		data->philo[i].fork[FIRST] = &data->forks[i];
-		data->philo[i].fork[SECOND] = &data->forks[(i + 1) % philo_nb];
+		data->philo[i].fork[i % 2 ? SECOND : FIRST] = &data->forks[i];
+		data->philo[i].fork[i % 2 ? FIRST : SECOND] = \
+		&data->forks[(i + 1) % philo_nb];
 		data->philo[i].eating_mtx = &data->eating_mtx[i];
 		data->philo[i].last_eat_time = params->start_time;
 		data->philo[i].started_mtx = &data->started_mtx[i];
 		data->philo[i].started = 0;
-		data->philo[i].at_table_mtx = &data->at_table_mtx;
 		data->philo[i].params = params;
 		if ((data->philo[i].print.nb = nb_to_str(i + 1)) == NULL)
 			return (MALLOC_ERROR);
@@ -264,7 +277,9 @@ t_error	mutexes_init(int philo_nb, t_data *data)
 {
 	t_index	i;
 
-	if (pthread_mutex_init(&data->at_table_mtx, NULL))
+	if (pthread_mutex_init(&g_at_table_mtx, NULL))
+		return (MUTEX_ERROR);
+	if (pthread_mutex_init(&g_end_mtx, NULL))
 		return (MUTEX_ERROR);
 	if (pthread_mutex_init(&data->print_mtx, NULL))
 		return (MUTEX_ERROR);
@@ -332,18 +347,18 @@ t_error	read_args(t_params *parameters, char **argv)
 	return (SUCCESS);
 }
 
-void		wait_simulation_end(int philo_nb, t_mutex *at_table_mtx)
+void		wait_simulation_end(int philo_nb)
 {
-	pthread_mutex_lock(at_table_mtx);
+	pthread_mutex_lock(&g_end_mtx);
+	pthread_mutex_lock(&g_at_table_mtx);
 	while (g_at_table > 0)
 	{
-		pthread_mutex_unlock(at_table_mtx);
-		usleep(1);
-		pthread_mutex_lock(at_table_mtx);
+		pthread_mutex_unlock(&g_at_table_mtx);
+		usleep(10);
+		pthread_mutex_lock(&g_at_table_mtx);
 	}
-	/* still needed with only one monit' thread ? */
-	/* test with high philo numbers */
-	usleep(10000 * philo_nb);
+	usleep(100 * philo_nb);
+	pthread_mutex_unlock(&g_end_mtx);
 }
 
 /* 
@@ -359,8 +374,8 @@ TODO :
  (prendre i + 1 ? philosophes commençants a 1 ?)
 
  faire le cécoupage + make
-
 */
+
 int				main(int argc, char **argv)
 {
 	t_data		data;
@@ -380,6 +395,6 @@ int				main(int argc, char **argv)
 		return (exit_error(error));
 	if ((error = launch_simulation(parameters.philo_nb, data.philo)))
 		return (exit_error(error));
-	wait_simulation_end(parameters.philo_nb, &data.at_table_mtx);
+	wait_simulation_end(parameters.philo_nb);
 	return (EXIT_SUCCESS);
 }
