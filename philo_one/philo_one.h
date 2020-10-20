@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 12:14:16 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/20 13:16:32 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/10/20 14:48:47 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,7 @@ typedef struct			s_params
 	t_time				tt_eat;
 	t_time				tt_sleep;
 	int					must_eat_nb;
-	t_mutex				write_mtx;
-	t_mutex				death_mtx;
+	t_time				start_time;
 }						t_params;
 
 typedef struct			s_philo
@@ -62,6 +61,8 @@ typedef struct			s_philo
 	char				*nb;
 	size_t				nb_len;
 	t_mutex				*fork[2];
+	t_mutex				*write_mtx;
+	t_mutex				*death_mtx;
 	t_mutex				eat_mtx;
 	t_mutex				monit_mtx;
 	t_time				death_time;
@@ -72,6 +73,8 @@ typedef struct			s_data
 {
 	t_mutex				*forks;
 	t_philo				*philo;
+	t_mutex				write_mtx;
+	t_mutex				death_mtx;
 	const t_params		parameters;
 }						t_data;
 

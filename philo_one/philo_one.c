@@ -13,7 +13,7 @@
 #include "philo_one.h"
 
 /* start time.c */
-time_t			get_time(void)
+t_time			get_time(void)
 {
 	struct timeval	tv;
 
@@ -21,9 +21,9 @@ time_t			get_time(void)
 	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
 }
 
-int				update_time(time_t *last_time)
+int				update_time(t_time *last_time)
 {
-	time_t			curr_time;
+	t_time		curr_time;
 
 	curr_time = get_time();
 	if (*last_time == curr_time)
@@ -32,11 +32,12 @@ int				update_time(time_t *last_time)
 	return (1);
 }
 
+#include <stdio.h>
 void			time_to_str(char *buf, t_time time)
 {
 	t_index	i;
 
-	i = 14;
+	i = 11;
 	buf[i] = ' ';
 	while (time)
 	{
@@ -44,6 +45,8 @@ void			time_to_str(char *buf, t_time time)
 		buf[i] = (time % 10) + '0';
 		time /= 10;
 	}
+	while (i--)
+		buf[i] = '0';
 }
 /* end time.c */
 
@@ -115,6 +118,7 @@ t_error	get_parameters(t_params *parameters, char **argv)
 		parameters->must_eat_nb = 0;
 	else if ((parameters->must_eat_nb = atoi(argv[5])) < 1)
 		return (ARGS_ERROR);
+	parameters->start_time = get_time();
 	return (SUCCESS);
 }
 
@@ -122,16 +126,20 @@ t_error	init_mutexes(t_data *simulation, const t_params *parameters)
 {
 	t_index i;
 
-	if (pthread_mutex_init((t_mutex*)&parameters->write_mtx, NULL))
+	if (pthread_mutex_init(&simulation->write_mtx, NULL))
 		return (MUTEX_ERROR);
-	if (pthread_mutex_init((t_mutex*)&parameters->death_mtx, NULL))
+	if (pthread_mutex_init(&simulation->death_mtx, NULL))
 		return (MUTEX_ERROR);
-	pthread_mutex_lock((t_mutex*)&parameters->death_mtx);
+	pthread_mutex_lock(&simulation->death_mtx);
 	while (i < parameters->philo_nb)
 	{
+		if (pthread_mutex_init(&simulation->forks[i], NULL))
+			return (MUTEX_ERROR);
 		simulation->philo[i].fork[0] = &simulation->forks[i];
 		simulation->philo[i].fork[1] = \
 		&simulation->forks[(i + 1) % parameters->philo_nb];
+		simulation->philo[i].write_mtx = &simulation->write_mtx;
+		simulation->philo[i].death_mtx = &simulation->death_mtx;
 		if (pthread_mutex_init(&simulation->philo[i].monit_mtx, NULL))
 			return (MUTEX_ERROR);
 		if (pthread_mutex_init(&simulation->philo[i].eat_mtx, NULL))
@@ -187,6 +195,7 @@ static char	*get_state_str(t_state state)
 		return ("must eat count reached\n");
 	return (" died\n");
 }
+
 static size_t	get_state_len(t_state state)
 {
 	if (state == EATING)
@@ -205,22 +214,22 @@ static size_t	get_state_len(t_state state)
 void	print_state(t_philo *philo, t_state state)
 {
 	static int		sim_end = 0;
-	static time_t	time = 0;
-	static char		time_str[15];
+	static t_time	time = 0;
+	static char		time_str[12];
 
-	pthread_mutex_lock((t_mutex*)&philo->params->write_mtx);
+	pthread_mutex_lock(philo->write_mtx);
 	if (!sim_end)
 	{
 		if (update_time(&time))
-			time_to_str(time_str, time);
-		write(STDOUT, time_str, 15);
+			time_to_str(time_str, time - philo->params->start_time);
+		write(STDOUT, time_str, 12);
 		if (state != DONE)
 			write(STDOUT, philo->nb, philo->nb_len);
 		write(STDOUT, get_state_str(state), get_state_len(state));
-		if (state == DIED)
+		if (state == DIED || state == DONE)
 			sim_end = 1;
+		pthread_mutex_unlock(philo->write_mtx);
 	}
-	pthread_mutex_unlock((t_mutex*)&philo->params->write_mtx);
 }
 /* end print.c */
 
@@ -272,7 +281,7 @@ void	*eat_monitor(void *sim_void)
 		}
 	}
 	print_state(&simulation->philo[0], DONE);
-	pthread_mutex_unlock((t_mutex*)&simulation->parameters.death_mtx);
+	pthread_mutex_unlock(&simulation->death_mtx);
 	return (NULL);
 }
 
@@ -284,11 +293,10 @@ void	*death_monitor(void *philo_void)
 	while (1)
 	{
 		pthread_mutex_lock(&philo->monit_mtx);
-		if (get_time() > philo->death_time) // is eating utile ???
+		if (get_time() > philo->death_time)
 		{
 			print_state(philo, DIED);
-			pthread_mutex_unlock(&philo->monit_mtx);
-			pthread_mutex_unlock((t_mutex*)&philo->params->death_mtx);
+			pthread_mutex_unlock(philo->death_mtx);
 			return (NULL);
 		}
 		pthread_mutex_unlock(&philo->monit_mtx);
@@ -342,11 +350,7 @@ t_error	start_simulation(t_data *simulation, const t_params *parameters)
 	}
 	return (SUCCESS);
 }
-/* end simulation.c */
 
-//*****************************************************************************
-
-/* start main.c */
 int		 main(int argc, char **argv)
 {
 	t_data	simulation;
@@ -360,8 +364,7 @@ int		 main(int argc, char **argv)
 		return (exit_error(error));
 	if (start_simulation(&simulation, &simulation.parameters))
 		return (exit_error(THREAD_ERROR));
-	pthread_mutex_lock((t_mutex*)&simulation.parameters.death_mtx);
-	pthread_mutex_unlock((t_mutex*)&simulation.parameters.death_mtx);
+	pthread_mutex_lock(&simulation.death_mtx);
 	return (EXIT_SUCCESS);
 }
-/* end main.c */
+/* end simulation.c */
