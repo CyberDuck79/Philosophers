@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/20 13:05:56 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/04/23 08:47:36 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/10/16 20:55:23 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ typedef struct			s_print
 
 typedef struct			s_philo
 {
+	int					nb;
 	t_mutex				*fork[2];
 	t_mutex				*eating_mtx;
 	t_time				last_eat_time;
@@ -93,6 +94,9 @@ typedef struct			s_data
 	t_philo				*philo;
 	char				*str[6];
 	size_t				str_len[6];
+	// new
+	const t_params		parameters;
+	t_mutex				end_sim_mtx;
 }						t_data;
 
 #endif

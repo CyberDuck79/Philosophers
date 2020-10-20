@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/20 13:18:58 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/16 14:27:19 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/10/16 16:10:30 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,32 +78,34 @@ void			time_to_str(char *buf, t_time time)
 	}
 }
 
-void			print_state(t_print *print, t_state state, int at_table)
+void			print_state(t_print *print, t_state state)
 {
 	static time_t	time;
 	static char		time_str[15];
 
-	pthread_mutex_unlock(&g_at_table_mtx);
 	pthread_mutex_lock(print->print_mtx);
+	pthread_mutex_lock(&g_at_table_mtx);
+	if (!g_at_table)
+		pthread_mutex_lock(&g_end_mtx);
+	pthread_mutex_unlock(&g_at_table_mtx);
 	if (update_time(&time))
 		time_to_str(time_str, time);
 	write(STDOUT, time_str, 15);
 	write(STDOUT, print->nb, print->nb_len);
 	write(STDOUT, print->str[state], print->str_len[state]);
-	if (at_table > 0)
-		pthread_mutex_unlock(print->print_mtx);
+	pthread_mutex_unlock(print->print_mtx);
 }
 
 void			take_forks_and_eat(t_philo *philo)
 {
 	pthread_mutex_lock(philo->fork[FIRST]);
-	print_state(&philo->print, TAKING, g_at_table);
+	print_state(&philo->print, TAKING);
 	pthread_mutex_lock(philo->fork[SECOND]);
-	print_state(&philo->print, TAKING, g_at_table);
+	print_state(&philo->print, TAKING);
+	print_state(&philo->print, EATING);
 	pthread_mutex_lock(philo->eating_mtx);
 	philo->last_eat_time = get_time();
 	pthread_mutex_unlock(philo->eating_mtx);
-	print_state(&philo->print, EATING, g_at_table);
 	usleep(philo->params->time_to_eat);
 	pthread_mutex_unlock(philo->fork[FIRST]);
 	pthread_mutex_unlock(philo->fork[SECOND]);
@@ -121,17 +123,19 @@ void			*philosophing(void *data)
 	meal = 0;
 	while (1)
 	{
-		print_state(&philo->print, THINKING, g_at_table);
 		take_forks_and_eat(philo);
 		if (++meal == philo->params->must_eat_nb)
 		{
+			print_state(&philo->print, DONE);
 			pthread_mutex_lock(&g_at_table_mtx);
-			g_at_table--;
-			print_state(&philo->print, DONE, g_at_table);
+			if (g_at_table)
+				g_at_table--;
+			pthread_mutex_unlock(&g_at_table_mtx);
 			break;
 		}
-		print_state(&philo->print, SLEEPING, g_at_table);
+		print_state(&philo->print, SLEEPING);
 		usleep(philo->params->time_to_sleep);
+		print_state(&philo->print, THINKING);
 	}
 	pthread_mutex_lock(&g_end_mtx);
 	return (NULL);
@@ -178,9 +182,10 @@ void			*monitoring(void *data)
 			pthread_mutex_lock(p[i].eating_mtx);
 			if (get_time() - p[i].last_eat_time > p->params->time_to_die)
 			{
+				print_state(&p[i].print, DIED);
 				pthread_mutex_lock(&g_at_table_mtx);
 				g_at_table = 0;
-				print_state(&p[i].print, DIED, g_at_table);
+				pthread_mutex_unlock(&g_at_table_mtx);
 				pthread_mutex_lock(&g_end_mtx);
 				return (NULL);
 			}
@@ -354,7 +359,7 @@ void		wait_simulation_end(int philo_nb)
 	while (g_at_table > 0)
 	{
 		pthread_mutex_unlock(&g_at_table_mtx);
-		usleep(10);
+		usleep(100);
 		pthread_mutex_lock(&g_at_table_mtx);
 	}
 	usleep(100 * philo_nb);
