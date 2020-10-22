@@ -68,4 +68,3 @@ int		 main(int argc, char **argv)
 	pthread_mutex_lock(&state.death_mtx);
 	return (EXIT_SUCCESS);
 }
-/* end state.c */
