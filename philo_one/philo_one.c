@@ -122,59 +122,61 @@ t_error	get_parameters(t_params *parameters, char **argv)
 	return (SUCCESS);
 }
 
-t_error	init_mutexes(t_data *simulation, const t_params *parameters)
+t_error	init_mutexes(t_data *state, const t_params *parameters)
 {
 	t_index i;
 
-	if (pthread_mutex_init(&simulation->write_mtx, NULL))
+	if (pthread_mutex_init(&state->write_mtx, NULL))
 		return (MUTEX_ERROR);
-	if (pthread_mutex_init(&simulation->death_mtx, NULL))
+	if (pthread_mutex_init(&state->death_mtx, NULL))
 		return (MUTEX_ERROR);
-	pthread_mutex_lock(&simulation->death_mtx);
+	pthread_mutex_lock(&state->death_mtx);
 	while (i < parameters->philo_nb)
 	{
-		if (pthread_mutex_init(&simulation->forks[i], NULL))
+		if (pthread_mutex_init(&state->forks[i], NULL))
 			return (MUTEX_ERROR);
-		simulation->philo[i].fork[0] = &simulation->forks[i];
-		simulation->philo[i].fork[1] = \
-		&simulation->forks[(i + 1) % parameters->philo_nb];
-		simulation->philo[i].write_mtx = &simulation->write_mtx;
-		simulation->philo[i].death_mtx = &simulation->death_mtx;
-		if (pthread_mutex_init(&simulation->philo[i].monit_mtx, NULL))
+		state->philo[i].fork[0] = &state->forks[i];
+		state->philo[i].fork[1] = &state->forks[(i + 1) % parameters->philo_nb];
+		state->philo[i].write_mtx = &state->write_mtx;
+		state->philo[i].death_mtx = &state->death_mtx;
+		if (pthread_mutex_init(&state->philo[i].launch_mtx, NULL))
 			return (MUTEX_ERROR);
-		if (pthread_mutex_init(&simulation->philo[i].eat_mtx, NULL))
+		if (pthread_mutex_init(&state->philo[i].monit_mtx, NULL))
 			return (MUTEX_ERROR);
-		pthread_mutex_lock(&simulation->philo[i].eat_mtx);
+		if (pthread_mutex_init(&state->philo[i].eat_mtx, NULL))
+			return (MUTEX_ERROR);
+		pthread_mutex_lock(&state->philo[i].eat_mtx);
 		i++;
 	}
 	return (SUCCESS);
 }
 
-t_error	init_simulation(t_data *simulation, const t_params *parameters)
+t_error	init_state(t_data *state, const t_params *parameters)
 {
 	t_index i;
 
-	if (!(simulation->philo = 
+	if (!(state->philo = 
 		(t_philo*)malloc(sizeof(t_philo) * parameters->philo_nb)))
 		return (MALLOC_ERROR);
-	if (!(simulation->forks = 
+	if (!(state->forks = 
 		(t_mutex*)malloc(sizeof(t_mutex) * parameters->philo_nb)))
 		return (MALLOC_ERROR);
 	i = 0;
 	while (i < parameters->philo_nb)
 	{
-		if ((simulation->philo[i].nb = nb_to_str(i + 1)) == NULL)
+		if ((state->philo[i].nb = nb_to_str(i + 1)) == NULL)
 			return (MALLOC_ERROR);
 		if (i + 1 < 10)
-			simulation->philo[i].nb_len = 1;
+			state->philo[i].nb_len = 1;
 		else if (i + 1 < 100)
-			simulation->philo[i].nb_len = 2;
+			state->philo[i].nb_len = 2;
 		else
-			simulation->philo[i].nb_len = 3;
-		simulation->philo[i].params = parameters;
+			state->philo[i].nb_len = 3;
+		state->philo[i].params = parameters;
+		state->philo[i].launch_flag = 0;
 		i++;
 	}
-	return (init_mutexes(simulation, parameters));
+	return (init_mutexes(state, parameters));
 }
 /* end init.c */
 
@@ -220,14 +222,14 @@ void	print_state(t_philo *philo, t_state state)
 	pthread_mutex_lock(philo->write_mtx);
 	if (!sim_end)
 	{
+		if (state == DIED || state == DONE)
+			sim_end = 1;
 		if (update_time(&time))
 			time_to_str(time_str, time - philo->params->start_time);
 		write(STDOUT, time_str, 12);
 		if (state != DONE)
 			write(STDOUT, philo->nb, philo->nb_len);
 		write(STDOUT, get_state_str(state), get_state_len(state));
-		if (state == DIED || state == DONE)
-			sim_end = 1;
 		pthread_mutex_unlock(philo->write_mtx);
 	}
 }
@@ -262,26 +264,26 @@ void	sleeping(t_philo *philo)
 
 //*****************************************************************************
 
-/* start simulation.c */
+/* start state.c */
 void	*eat_monitor(void *sim_void)
 {
 	t_index	i;
-	t_data	*simulation;
+	t_data	*state;
 	int		eat_count;
 
-	simulation = (t_data*)sim_void;
-	eat_count = simulation->parameters.must_eat_nb;
+	state = (t_data*)sim_void;
+	eat_count = state->parameters.must_eat_nb;
 	while (eat_count--)
 	{
 		i = 0;
-		while (i < simulation->parameters.philo_nb)
+		while (i < state->parameters.philo_nb)
 		{
-			pthread_mutex_lock(&simulation->philo[i].eat_mtx);
+			pthread_mutex_lock(&state->philo[i].eat_mtx);
 			i++;
 		}
 	}
-	print_state(&simulation->philo[0], DONE);
-	pthread_mutex_unlock(&simulation->death_mtx);
+	print_state(&state->philo[0], DONE);
+	pthread_mutex_unlock(&state->death_mtx);
 	return (NULL);
 }
 
@@ -318,6 +320,9 @@ void	*philosophing(void *philo_void)
 		return (NULL);
 	}
 	pthread_detach(tid);
+	pthread_mutex_lock(&philo->launch_mtx);
+	philo->launch_flag = 1;
+	pthread_mutex_unlock(&philo->launch_mtx);
 	while (1)
 	{
 		eating(philo);
@@ -327,44 +332,56 @@ void	*philosophing(void *philo_void)
 	return (NULL);
 }
 
-t_error	start_simulation(t_data *simulation, const t_params *parameters)
+t_error	launch_philo(t_data *state, const t_params *parameters, t_index i)
 {
-	t_index		i;
+	t_thread	tid;
+
+	while (i < parameters->philo_nb)
+	{
+		if (pthread_create(&tid, NULL, &philosophing, \
+		(void*)&state->philo[i]))
+			return (THREAD_ERROR);
+		pthread_detach(tid);
+		pthread_mutex_lock(&state->philo[i].launch_mtx);
+		while (!state->philo[i].launch_flag)
+		{
+			pthread_mutex_unlock(&state->philo[i].launch_mtx);
+			pthread_mutex_lock(&state->philo[i].launch_mtx);
+		}
+		i += 2;
+	}
+	return (SUCCESS);
+}
+
+t_error	start_state(t_data *state, const t_params *parameters)
+{
 	t_thread	tid;
 
 	if (parameters->must_eat_nb > 0)
 	{
-		if (pthread_create(&tid, NULL, &eat_monitor, (void*)simulation))
+		if (pthread_create(&tid, NULL, &eat_monitor, (void*)state))
 			return (THREAD_ERROR);
 		pthread_detach(tid);
 	}
-	i = 0;
-	while (i < parameters->philo_nb)
-	{
-		if (pthread_create(&tid, NULL, &philosophing, \
-		(void*)&simulation->philo[i]))
-			return (THREAD_ERROR);
-		pthread_detach(tid);
-		usleep(100);
-		i++;
-	}
+	launch_philo(state, parameters, 0);
+	launch_philo(state, parameters, 1);
 	return (SUCCESS);
 }
 
 int		 main(int argc, char **argv)
 {
-	t_data	simulation;
+	t_data	state;
 	t_error	error;
 
 	if (argc < 5 || argc > 6)
 		return (exit_error(USAGE));
-	if (get_parameters((t_params*)&simulation.parameters, argv))
+	if (get_parameters((t_params*)&state.parameters, argv))
 		return (exit_error(ARGS_ERROR));
-	if ((error = init_simulation(&simulation, &simulation.parameters)))
+	if ((error = init_state(&state, &state.parameters)))
 		return (exit_error(error));
-	if (start_simulation(&simulation, &simulation.parameters))
+	if (start_state(&state, &state.parameters))
 		return (exit_error(THREAD_ERROR));
-	pthread_mutex_lock(&simulation.death_mtx);
+	pthread_mutex_lock(&state.death_mtx);
 	return (EXIT_SUCCESS);
 }
-/* end simulation.c */
+/* end state.c */

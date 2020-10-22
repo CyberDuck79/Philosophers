@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 12:14:16 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/20 14:48:47 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/10/20 21:26:19 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,8 @@ typedef struct			s_philo
 	t_mutex				*fork[2];
 	t_mutex				*write_mtx;
 	t_mutex				*death_mtx;
+	int					launch_flag;
+	t_mutex				launch_mtx;
 	t_mutex				eat_mtx;
 	t_mutex				monit_mtx;
 	t_time				death_time;
