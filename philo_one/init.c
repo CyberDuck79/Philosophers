@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 12:13:04 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/22 12:51:54 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/10/22 13:18:06 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ t_error	        get_parameters(t_params *parameters, char **argv)
 {
 	if ((parameters->philo_nb = str_to_nb(argv[1])) < 2)
 		return (ARGS_ERROR);
-	if (parameters->philo_nb > 9999)
+	if (parameters->philo_nb > 999)
 		return (ARGS_ERROR);
 	if ((parameters->tt_die = (t_time)str_to_nb(argv[2])) < 1)
 		return (ARGS_ERROR);

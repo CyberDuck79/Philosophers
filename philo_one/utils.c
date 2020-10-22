@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 12:10:10 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/22 12:54:25 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/10/22 13:23:12 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,6 @@ int     str_to_nb(const char *str)
 	return (nb);
 }
 
-/*
-** Can't be more than 9999 because parsing do not accept it
-*/
 size_t	nb_str_len(unsigned long nb)
 {
 	if (nb < 10)
@@ -52,11 +49,9 @@ size_t	nb_str_len(unsigned long nb)
 char    *nb_to_str(unsigned long nb)
 {
 	char			*new;
-	unsigned long	tmp;
 	size_t			len;
 
 	len = nb_str_len(nb);
-	tmp = nb;
 	if (!(new = (char*)malloc(sizeof(char) * (len + 1))))
 		return (NULL);
 	new[0] = '0';

@@ -12,11 +12,11 @@
 
 #include "philo_one.h"
 
-static t_error	launch_philo(t_data *state, const t_params *parameters, t_index i)
+static t_error	launch_philo(t_data *state, t_index i)
 {
 	t_thread	tid;
 
-	while (i < parameters->philo_nb)
+	while (i < state->parameters->philo_nb)
 	{
 		if (pthread_create(&tid, NULL, &philosopher, (void*)&state->philo[i]))
 			return (THREAD_ERROR);
@@ -44,9 +44,9 @@ static t_error	start_simulation(t_data *state, const t_params *parameters)
 			return (THREAD_ERROR);
 		pthread_detach(tid);
 	}
-	if (launch_philo(state, parameters, EVEN))
+	if (launch_philo(state, EVEN))
 		return (THREAD_ERROR);
-	if (launch_philo(state, parameters, ODD))
+	if (launch_philo(state, ODD))
 		return (THREAD_ERROR);
 	return (SUCCESS);
 }
