@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 12:14:16 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/22 12:41:04 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/10/22 12:50:08 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ int						update_time(t_time *last_time);
 void					time_to_str(char *buf, t_time time);
 int						str_to_nb(const char *str);
 char					*nb_to_str(unsigned long nb);
+size_t					nb_str_len(unsigned long nb);
 int     				exit_error(t_error error);
 t_error	        		get_parameters(t_params *parameters, char **argv);
 t_error	       		 	init_state(t_data *state, const t_params *parameters);
