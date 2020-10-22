@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 12:14:16 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/20 21:26:19 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/10/22 12:41:04 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 
 # define STDOUT 1
 # define STDERR 2
+# define EVEN 0
+# define ODD 1
 
 typedef unsigned long	t_time;
 typedef unsigned long	t_index;
@@ -36,7 +38,14 @@ typedef enum			e_error
 	THREAD_ERROR
 }						t_error;
 
-typedef enum			e_state
+typedef enum			e_launch_status
+{
+	NOT_STARTED,
+	ERROR,
+	STARTED
+}						t_launch_status;
+
+typedef enum			e_philo_state
 {
 	THINKING,
 	TAKING,
@@ -44,7 +53,7 @@ typedef enum			e_state
 	SLEEPING,
 	DIED,
 	DONE
-}						t_state;
+}						t_philo_state;
 
 typedef struct			s_params
 {
@@ -63,21 +72,34 @@ typedef struct			s_philo
 	t_mutex				*fork[2];
 	t_mutex				*write_mtx;
 	t_mutex				*death_mtx;
-	int					launch_flag;
+	t_launch_status		launch_flag;
 	t_mutex				launch_mtx;
-	t_mutex				eat_mtx;
+	t_mutex				eat_count_mtx;
 	t_mutex				monit_mtx;
 	t_time				death_time;
-	const t_params		*params;
+	const t_params		*parameters;
 }						t_philo;
 
 typedef struct			s_data
 {
-	t_mutex				*forks;
+	t_mutex				*fork;
 	t_philo				*philo;
 	t_mutex				write_mtx;
 	t_mutex				death_mtx;
-	const t_params		parameters;
+	const t_params		*parameters;
 }						t_data;
+
+t_time					get_time(void);
+int						update_time(t_time *last_time);
+void					time_to_str(char *buf, t_time time);
+int						str_to_nb(const char *str);
+char					*nb_to_str(unsigned long nb);
+int     				exit_error(t_error error);
+t_error	        		get_parameters(t_params *parameters, char **argv);
+t_error	       		 	init_state(t_data *state, const t_params *parameters);
+void	        		print_state(t_philo *philo, t_philo_state state);
+void	    			*death_monitor(void *philo_void);
+void	    			*philosopher(void *philo_void);
+void	    			*eat_monitor(void *state_void);
 
 #endif
