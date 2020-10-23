@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 15:38:57 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/23 16:10:52 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/10/23 18:14:24 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ static t_error	init_mutexes(t_data *state, const t_params *parameters)
 
 	if (init_global_mutexes(state))
 		return (MUTEX_ERROR);
+	i = 0;
 	while (i < parameters->philo_nb)
 	{
 		if (pthread_mutex_init(&state->fork[i], NULL))

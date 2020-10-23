@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 15:39:44 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/23 18:08:18 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/10/23 18:13:42 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ typedef enum			e_philo_state
 
 typedef struct			s_params
 {
-	int					philo_nb;
+	size_t				philo_nb;
 	t_time				tt_die;
 	t_time				tt_eat;
 	t_time				tt_sleep;
