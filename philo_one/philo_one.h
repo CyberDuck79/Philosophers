@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 15:39:44 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/23 16:13:21 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/10/23 18:08:18 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,6 @@
 
 # define STDOUT 1
 # define STDERR 2
-# define EVEN 0
-# define ODD 1
-# define LEFT(i, n) (((i) + (n - 1)) % n)
-# define RIGHT(i, n) (((i) + 1) % n)
 
 typedef unsigned long	t_time;
 typedef unsigned long	t_index;
