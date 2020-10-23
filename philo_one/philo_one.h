@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/20 12:14:16 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/22 12:50:08 by fhenrion         ###   ########.fr       */
+/*   Created: 2020/10/22 15:39:44 by fhenrion          #+#    #+#             */
+/*   Updated: 2020/10/23 16:13:21 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@
 # define STDERR 2
 # define EVEN 0
 # define ODD 1
+# define LEFT(i, n) (((i) + (n - 1)) % n)
+# define RIGHT(i, n) (((i) + 1) % n)
 
 typedef unsigned long	t_time;
 typedef unsigned long	t_index;
@@ -95,12 +97,15 @@ void					time_to_str(char *buf, t_time time);
 int						str_to_nb(const char *str);
 char					*nb_to_str(unsigned long nb);
 size_t					nb_str_len(unsigned long nb);
-int     				exit_error(t_error error);
-t_error	        		get_parameters(t_params *parameters, char **argv);
-t_error	       		 	init_state(t_data *state, const t_params *parameters);
-void	        		print_state(t_philo *philo, t_philo_state state);
-void	    			*death_monitor(void *philo_void);
-void	    			*philosopher(void *philo_void);
-void	    			*eat_monitor(void *state_void);
+int						exit_error(t_error error);
+t_error					get_parameters(t_params *parameters, char **argv);
+t_error				 	init_state(t_data *state, const t_params *parameters);
+void					print_state(t_philo *philo, t_philo_state state);
+void					*death_monitor(void *philo_void);
+void					*philosopher(void *philo_void);
+void					*eat_monitor(void *state_void);
+int						left(t_index i, size_t len);
+int						right(t_index i, size_t len);
+
 
 #endif

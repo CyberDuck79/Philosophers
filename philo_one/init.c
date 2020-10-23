@@ -5,25 +5,25 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/22 12:13:04 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/22 13:18:06 by fhenrion         ###   ########.fr       */
+/*   Created: 2020/10/22 15:38:57 by fhenrion          #+#    #+#             */
+/*   Updated: 2020/10/23 16:10:52 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_one.h"
 
-t_error	        get_parameters(t_params *parameters, char **argv)
+t_error			get_parameters(t_params *parameters, char **argv)
 {
 	if ((parameters->philo_nb = str_to_nb(argv[1])) < 2)
 		return (ARGS_ERROR);
 	if (parameters->philo_nb > 999)
 		return (ARGS_ERROR);
-	if ((parameters->tt_die = (t_time)str_to_nb(argv[2])) < 1)
+	if ((parameters->tt_die = str_to_nb(argv[2])) < 1)
 		return (ARGS_ERROR);
-	if ((parameters->tt_eat = (t_time)str_to_nb(argv[3])) < 1)
+	if ((parameters->tt_eat = str_to_nb(argv[3])) < 1)
 		return (ARGS_ERROR);
 	parameters->tt_eat *= 1000;
-	if ((parameters->tt_sleep = (t_time)str_to_nb(argv[4])) < 1)
+	if ((parameters->tt_sleep = str_to_nb(argv[4])) < 1)
 		return (ARGS_ERROR);
 	parameters->tt_sleep *= 1000;
 	if (!argv[5])
@@ -34,21 +34,28 @@ t_error	        get_parameters(t_params *parameters, char **argv)
 	return (SUCCESS);
 }
 
-static t_error	init_mutexes(t_data *state, const t_params *parameters)
+static t_error	init_global_mutexes(t_data *state)
 {
-	t_index i;
-
 	if (pthread_mutex_init(&state->write_mtx, NULL))
 		return (MUTEX_ERROR);
 	if (pthread_mutex_init(&state->death_mtx, NULL))
 		return (MUTEX_ERROR);
 	pthread_mutex_lock(&state->death_mtx);
+	return (SUCCESS);
+}
+
+static t_error	init_mutexes(t_data *state, const t_params *parameters)
+{
+	t_index i;
+
+	if (init_global_mutexes(state))
+		return (MUTEX_ERROR);
 	while (i < parameters->philo_nb)
 	{
 		if (pthread_mutex_init(&state->fork[i], NULL))
 			return (MUTEX_ERROR);
-		state->philo[i].fork[0] = &state->fork[i];
-		state->philo[i].fork[1] = &state->fork[(i + 1) % parameters->philo_nb];
+		state->philo[i].fork[0] = &state->fork[left(i, parameters->philo_nb)];
+		state->philo[i].fork[1] = &state->fork[right(i, parameters->philo_nb)];
 		state->philo[i].write_mtx = &state->write_mtx;
 		state->philo[i].death_mtx = &state->death_mtx;
 		if (pthread_mutex_init(&state->philo[i].launch_mtx, NULL))
@@ -63,11 +70,11 @@ static t_error	init_mutexes(t_data *state, const t_params *parameters)
 	return (SUCCESS);
 }
 
-t_error	        init_state(t_data *state, const t_params *parameters)
+t_error			init_state(t_data *state, const t_params *parameters)
 {
 	t_index i;
 
-    state->parameters = parameters;
+	state->parameters = parameters;
 	if (!(state->philo = \
 		(t_philo*)malloc(sizeof(t_philo) * parameters->philo_nb)))
 		return (MALLOC_ERROR);

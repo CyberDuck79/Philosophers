@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 12:38:15 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/22 12:40:55 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/10/23 16:09:31 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,21 +20,21 @@ static void	eating(t_philo *philo)
 	print_state(philo, TAKING);
 	pthread_mutex_lock(&philo->monit_mtx);
 	philo->death_time = get_time() + philo->parameters->tt_die;
+	pthread_mutex_unlock(&philo->monit_mtx);
 	print_state(philo, EATING);
 	usleep(philo->parameters->tt_eat);
-	pthread_mutex_unlock(&philo->monit_mtx);
 	pthread_mutex_unlock(&philo->eat_count_mtx);
 }
 
 static void	sleeping(t_philo *philo)
 {
 	print_state(philo, SLEEPING);
-	pthread_mutex_unlock(philo->fork[0]);
 	pthread_mutex_unlock(philo->fork[1]);
+	pthread_mutex_unlock(philo->fork[0]);
 	usleep(philo->parameters->tt_sleep);
 }
 
-void	    *eat_monitor(void *state_void)
+void		*eat_monitor(void *state_void)
 {
 	t_index	i;
 	t_data	*state;
@@ -56,7 +56,7 @@ void	    *eat_monitor(void *state_void)
 	return (NULL);
 }
 
-void	    *death_monitor(void *philo_void)
+void		*death_monitor(void *philo_void)
 {
 	t_philo	*philo;
 
@@ -76,7 +76,7 @@ void	    *death_monitor(void *philo_void)
 	return (NULL);
 }
 
-void	    *philosopher(void *philo_void)
+void		*philosopher(void *philo_void)
 {
 	t_philo		*philo;
 	t_thread	tid;

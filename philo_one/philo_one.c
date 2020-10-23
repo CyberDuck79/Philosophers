@@ -1,22 +1,24 @@
-/* *********************************************************************************************************** */
-/*																			*/
-/*														:::	  ::::::::   */
-/*   philo_one.c										:+:	  :+:	:+:   */
-/*													+:+ +:+		 +:+	 */
-/*   By: fhenrion <fhenrion@student.42.fr>		  +#+  +:+	   +#+		*/
-/*												+#+#+#+#+#+   +#+		   */
-/*   Created: 2020/10/16 20:22:50 by fhenrion		  #+#	#+#			 */
-/*   Updated: 2020/10/16 22:29:45 by fhenrion		 ###   ########.fr	   */
-/*																			*/
-/* *********************************************************************************************************** */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo_one.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/10/22 13:28:38 by fhenrion          #+#    #+#             */
+/*   Updated: 2020/10/23 17:17:23 by fhenrion         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "philo_one.h"
 
-static t_error	launch_philo(t_data *state, t_index i)
+static t_error	launch_philo(t_data *state, const t_params *parameters)
 {
+	t_index 	i;
 	t_thread	tid;
 
-	while (i < state->parameters->philo_nb)
+	i = 0;
+	while (i < parameters->philo_nb)
 	{
 		if (pthread_create(&tid, NULL, &philosopher, (void*)&state->philo[i]))
 			return (THREAD_ERROR);
@@ -29,7 +31,7 @@ static t_error	launch_philo(t_data *state, t_index i)
 		}
 		if (state->philo[i].launch_flag == ERROR)
 			return (THREAD_ERROR);
-		i += 2;
+		i++;
 	}
 	return (SUCCESS);
 }
@@ -44,9 +46,7 @@ static t_error	start_simulation(t_data *state, const t_params *parameters)
 			return (THREAD_ERROR);
 		pthread_detach(tid);
 	}
-	if (launch_philo(state, EVEN))
-		return (THREAD_ERROR);
-	if (launch_philo(state, ODD))
+	if (launch_philo(state, parameters))
 		return (THREAD_ERROR);
 	return (SUCCESS);
 }

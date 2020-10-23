@@ -5,14 +5,14 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/22 12:35:19 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/22 12:37:14 by fhenrion         ###   ########.fr       */
+/*   Created: 2020/10/22 15:39:58 by fhenrion          #+#    #+#             */
+/*   Updated: 2020/10/22 15:40:01 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_one.h"
 
-static char	    *get_state_str(t_philo_state state)
+static char		*get_state_str(t_philo_state state)
 {
 	if (state == EATING)
 		return (" is eating\n");
@@ -42,7 +42,7 @@ static size_t	get_state_len(t_philo_state state)
 	return (7);
 }
 
-void	        print_state(t_philo *philo, t_philo_state state)
+void			print_state(t_philo *philo, t_philo_state state)
 {
 	static int		sim_end = 0;
 	static t_time	time = 0;

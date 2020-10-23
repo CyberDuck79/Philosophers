@@ -6,17 +6,30 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 12:10:10 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/22 13:23:12 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/10/23 12:44:53 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_one.h"
 
-int     str_to_nb(const char *str)
+static int	ft_pow(int op1, int op2)
+{
+	int mult = op1;
+
+	if (!op2)
+		return (1);
+	if (op2 == 1)
+		return (op1);
+	op2--;
+	while (op2--)
+		op1 *= mult;
+	return (op1);
+}
+
+int			str_to_nb(const char *str)
 {
 	int		nb;
-	size_t	nb_len;
-	int		mult;
+	int		nb_len;
 
 	if (*str == '-')
 		return (-1);
@@ -28,14 +41,13 @@ int     str_to_nb(const char *str)
 		nb_len++;
 	while (nb_len--)
 	{
-		mult = (nb_len ? 10 * nb_len : 1);
-		nb += (*str - '0') * mult;
+		nb += (*str - '0') * ft_pow(10, nb_len);
 		str++;
 	}
 	return (nb);
 }
 
-size_t	nb_str_len(unsigned long nb)
+size_t		nb_str_len(unsigned long nb)
 {
 	if (nb < 10)
 		return (1);
@@ -46,7 +58,7 @@ size_t	nb_str_len(unsigned long nb)
 	return (4);
 }
 
-char    *nb_to_str(unsigned long nb)
+char		*nb_to_str(unsigned long nb)
 {
 	char			*new;
 	size_t			len;
@@ -65,7 +77,7 @@ char    *nb_to_str(unsigned long nb)
 	return (new);
 }
 
-int     exit_error(t_error error)
+int			exit_error(t_error error)
 {
 	if (error == USAGE)
 		write(STDERR, "USAGE : philo_one number_of_philosopher time_to_die"
