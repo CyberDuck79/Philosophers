@@ -6,7 +6,7 @@
 #    By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/12/07 11:40:22 by fhenrion          #+#    #+#              #
-#    Updated: 2020/10/23 18:19:04 by fhenrion         ###   ########.fr        #
+#    Updated: 2020/11/01 11:01:17 by fhenrion         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ SRC = $(addsuffix .c,$(SRC_NAME))
 SRC_O = $(addsuffix .o,$(SRC_NAME))
 
 CC = gcc
-CFLAGS = -Werror -Wall -Wextra
+CFLAGS = -Werror -Wall -Wextra -pthread
 
 .PHONY: clean fclean all re bonus
 
@@ -32,7 +32,7 @@ $(NAME): $(SRC_O)
 	$(CC) -c $(CFLAGS) -I $(HDR_NAME) $< -o $@
 
 commit:
-	git add $(SRC) Makefile
+	git add $(SRC) ${HDR_NAME} Makefile
 	git commit -m 'makefile_commit'
 	git push
 
