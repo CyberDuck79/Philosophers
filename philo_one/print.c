@@ -6,13 +6,13 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 15:39:58 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/22 15:40:01 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/01 22:58:02 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_one.h"
 
-static char		*get_state_str(t_philo_state state)
+static char		*get_state_str(const t_philo_state state)
 {
 	if (state == EATING)
 		return (" is eating\n");
@@ -27,7 +27,7 @@ static char		*get_state_str(t_philo_state state)
 	return (" died\n");
 }
 
-static size_t	get_state_len(t_philo_state state)
+static size_t	get_state_len(const t_philo_state state)
 {
 	if (state == EATING)
 		return (12);
@@ -42,7 +42,7 @@ static size_t	get_state_len(t_philo_state state)
 	return (7);
 }
 
-void			print_state(t_philo *philo, t_philo_state state)
+void			print_state(t_philo *philo, const t_philo_state state)
 {
 	static int		sim_end = 0;
 	static t_time	time = 0;

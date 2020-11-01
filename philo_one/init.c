@@ -6,13 +6,13 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 15:38:57 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/23 18:14:24 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/01 22:57:25 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_one.h"
 
-t_error			get_parameters(t_params *parameters, char **argv)
+t_error			get_params(t_params *parameters, const char **argv)
 {
 	if ((parameters->philo_nb = str_to_nb(argv[1])) < 2)
 		return (ARGS_ERROR);
