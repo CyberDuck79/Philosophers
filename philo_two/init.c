@@ -6,13 +6,13 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 15:38:57 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/11/01 10:39:37 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/01 23:06:37 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_two.h"
 
-t_error			get_parameters(t_params *parameters, char **argv)
+t_error			get_params(t_params *parameters, const char **argv)
 {
 	if ((parameters->philo_nb = str_to_nb(argv[1])) < 2)
 		return (ARGS_ERROR);
@@ -57,7 +57,7 @@ static t_error	init_global_sem(t_data *state, const size_t philo_nb)
 	return (SUCCESS);
 }
 
-static t_error	init_philo_sem(t_philo *philo, t_index i)
+static t_error	init_philo_sem(t_philo *philo, const t_index i)
 {
 	char	*name;
 

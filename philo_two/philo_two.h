@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 15:39:44 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/11/01 10:41:04 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/01 23:09:01 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,16 +100,16 @@ int						update_time(t_time *last_time);
 void					time_to_str(char *buf, t_time time);
 int						str_to_nb(const char *str);
 char					*nb_to_str(unsigned long nb);
-size_t					nb_str_len(unsigned long nb);
+size_t					nb_str_len(const unsigned long nb);
 void					str_copy(char *dest, const char *src);
-int						exit_error(t_error error, t_data *state);
-t_error					get_parameters(t_params *parameters, char **argv);
+int						exit_error(const t_error error, t_data *state);
+t_error					get_params(t_params *parameters, const char **argv);
 t_error					init_state(t_data *state, const t_params *parameters);
-int						print_state(t_philo *philo, t_philo_state state);
+int						print_state(t_philo *philo, const t_philo_state state);
 void					*death_monitor(void *philo_void);
 void					*philosopher(void *philo_void);
 void					*eat_monitor(void *state_void);
 void					unlink_semaphores(const size_t philo_nb);
-char					*gen_name(const char *prefix, t_index i);
+char					*gen_name(const char *prefix, const t_index i);
 
 #endif

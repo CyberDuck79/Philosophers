@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 13:28:38 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/11/01 10:45:06 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/01 23:06:25 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ int				main(int argc, char **argv)
 
 	if (argc < 5 || argc > 6)
 		return (exit_error(USAGE, NULL));
-	if (get_parameters((t_params*)&parameters, argv))
+	if (get_params((t_params*)&parameters, (const char**)argv))
 		return (exit_error(ARGS_ERROR, NULL));
 	if ((error = init_state(&state, &parameters)))
 		return (exit_error(error, &state));

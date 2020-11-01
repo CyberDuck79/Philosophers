@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 12:10:10 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/31 16:16:16 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/01 23:08:51 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int			str_to_nb(const char *str)
 	return (nb);
 }
 
-size_t		nb_str_len(unsigned long nb)
+size_t		nb_str_len(const unsigned long nb)
 {
 	if (nb < 10)
 		return (1);
@@ -70,7 +70,7 @@ void		str_copy(char *dest, const char *src)
 	*dest = '\0';
 }
 
-int			exit_error(t_error error, t_data *state)
+int			exit_error(const t_error error, t_data *state)
 {
 	if (error == USAGE)
 		write(STDERR, "USAGE : philo_one number_of_philosopher time_to_die"
