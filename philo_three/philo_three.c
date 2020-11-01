@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 13:28:38 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/11/01 10:36:16 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/01 23:01:22 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ static t_error	start_simulation(t_data *state, const t_params *parameters)
 	return (SUCCESS);
 }
 
-static void		terminate_childs(pid_t *pid, const size_t philo_nb)
+static void		terminate_childs(const pid_t *pid, const size_t philo_nb)
 {
 	t_index i;
 
@@ -71,7 +71,7 @@ int				main(int argc, char **argv)
 
 	if (argc < 5 || argc > 6)
 		return (exit_error(USAGE, NULL));
-	if (get_parameters((t_params*)&parameters, argv))
+	if (get_params((t_params*)&parameters, (const char **)argv))
 		return (exit_error(ARGS_ERROR, NULL));
 	if ((error = init_state(&state, &parameters)))
 		return (exit_error(error, &state));

@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/31 15:04:14 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/11/01 10:37:48 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/01 23:04:08 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ static size_t	str_len(const char *str)
 	return (len);
 }
 
-char			*gen_name(const char *prefix, t_index i)
+char			*gen_name(const char *prefix, const t_index i)
 {
 	char	*name_str;
 	char	*nb_str;
