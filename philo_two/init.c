@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 15:38:57 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/31 17:01:50 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/01 10:39:37 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,49 +34,49 @@ t_error			get_parameters(t_params *parameters, char **argv)
 	return (SUCCESS);
 }
 
-static t_error		init_global_sem(t_data *state, const size_t philo_nb)
+static t_error	init_global_sem(t_data *state, const size_t philo_nb)
 {
 	if ((state->forks_sem = \
-	sem_open("/forks", O_CREAT|O_EXCL, S_IRWXU, philo_nb)) == SEM_FAILED)
+	sem_open("/forks", O_CREAT | O_EXCL, S_IRWXU, philo_nb)) == SEM_FAILED)
 		return (SEMAPHORE_ERROR);
 	if ((state->take_sem = \
-	sem_open("/take", O_CREAT|O_EXCL, S_IRWXU, 1)) == SEM_FAILED)
+	sem_open("/take", O_CREAT | O_EXCL, S_IRWXU, 1)) == SEM_FAILED)
 		return (SEMAPHORE_ERROR);
 	if ((state->launch_barrier_sem = \
-	sem_open("/launch_barrier", O_CREAT|O_EXCL, S_IRWXU, 0)) == SEM_FAILED)
+	sem_open("/launch_barrier", O_CREAT | O_EXCL, S_IRWXU, 0)) == SEM_FAILED)
 		return (SEMAPHORE_ERROR);
 	if ((state->write_sem = \
-	sem_open("/write", O_CREAT|O_EXCL, S_IRWXU, 1)) == SEM_FAILED)
+	sem_open("/write", O_CREAT | O_EXCL, S_IRWXU, 1)) == SEM_FAILED)
 		return (SEMAPHORE_ERROR);
 	if ((state->death_sem = \
-	sem_open("/death", O_CREAT|O_EXCL, S_IRWXU, 0)) == SEM_FAILED)
+	sem_open("/death", O_CREAT | O_EXCL, S_IRWXU, 0)) == SEM_FAILED)
 		return (SEMAPHORE_ERROR);
 	if ((state->eat_count_sem = \
-	sem_open("/eat_count", O_CREAT|O_EXCL, S_IRWXU, 0)) == SEM_FAILED)
+	sem_open("/eat_count", O_CREAT | O_EXCL, S_IRWXU, 0)) == SEM_FAILED)
 		return (SEMAPHORE_ERROR);
 	return (SUCCESS);
 }
 
-static t_error		init_philo_sem(t_philo *philo, t_index i)
+static t_error	init_philo_sem(t_philo *philo, t_index i)
 {
-	char *name;
+	char	*name;
 
 	if ((name = gen_name("/launch_", i)) == NULL)
 		return (SEMAPHORE_ERROR);
 	if ((philo->launch_flag_sem = \
-	sem_open(name, O_CREAT|O_EXCL, S_IRWXU, 1)) == SEM_FAILED)
+	sem_open(name, O_CREAT | O_EXCL, S_IRWXU, 1)) == SEM_FAILED)
 		return (SEMAPHORE_ERROR);
 	free(name);
 	if ((name = gen_name("/monit_", i)) == NULL)
 		return (SEMAPHORE_ERROR);
 	if ((philo->monit_sem = \
-	sem_open(name, O_CREAT|O_EXCL, S_IRWXU, 1)) == SEM_FAILED)
+	sem_open(name, O_CREAT | O_EXCL, S_IRWXU, 1)) == SEM_FAILED)
 		return (SEMAPHORE_ERROR);
 	free(name);
 	return (SUCCESS);
 }
 
-static t_error		init_semaphores(t_data *state, const size_t philo_nb)
+static t_error	init_semaphores(t_data *state, const size_t philo_nb)
 {
 	t_index i;
 

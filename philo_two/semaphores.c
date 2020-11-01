@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/31 15:04:14 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/31 17:04:07 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/01 10:40:34 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void			unlink_semaphores(const size_t philo_nb)
 {
 	t_index	i;
-	char 	*name;
+	char	*name;
 
 	sem_unlink("/forks");
 	sem_unlink("/take");
@@ -52,7 +52,7 @@ static size_t	str_len(const char *str)
 
 char			*gen_name(const char *prefix, t_index i)
 {
-	char 	*name_str;
+	char	*name_str;
 	char	*nb_str;
 
 	if (!(name_str = (char*)malloc(str_len(prefix) + nb_str_len(i) + 1)))

@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 15:39:44 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/31 16:59:57 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/01 10:41:04 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,13 +104,12 @@ size_t					nb_str_len(unsigned long nb);
 void					str_copy(char *dest, const char *src);
 int						exit_error(t_error error, t_data *state);
 t_error					get_parameters(t_params *parameters, char **argv);
-t_error				 	init_state(t_data *state, const t_params *parameters);
+t_error					init_state(t_data *state, const t_params *parameters);
 int						print_state(t_philo *philo, t_philo_state state);
 void					*death_monitor(void *philo_void);
 void					*philosopher(void *philo_void);
 void					*eat_monitor(void *state_void);
 void					unlink_semaphores(const size_t philo_nb);
 char					*gen_name(const char *prefix, t_index i);
-
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 13:28:38 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/31 12:02:47 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/01 10:42:35 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static t_error	launch_philo(t_data *state, const t_params *parameters)
 {
-	t_index 	i;
+	t_index		i;
 	t_thread	tid;
 
 	i = 0;
@@ -51,7 +51,7 @@ static t_error	start_simulation(t_data *state, const t_params *parameters)
 	return (SUCCESS);
 }
 
-int		 main(int argc, char **argv)
+int				main(int argc, char **argv)
 {
 	t_data			state;
 	const t_params	parameters;

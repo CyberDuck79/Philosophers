@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 13:28:38 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/10/31 18:13:45 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/01 10:41:15 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static t_error	launch_philo(t_data *state, const size_t philo_nb)
 {
-	t_index 	i;
+	t_index		i;
 	t_thread	tid;
 
 	i = 0;
@@ -59,7 +59,7 @@ static t_error	start_simulation(t_data *state, const t_params *parameters)
 	return (SUCCESS);
 }
 
-int		 main(int argc, char **argv)
+int				main(int argc, char **argv)
 {
 	t_data			state;
 	const t_params	parameters;
@@ -75,6 +75,5 @@ int		 main(int argc, char **argv)
 		return (exit_error(THREAD_ERROR, &state));
 	sem_wait(state.death_sem);
 	unlink_semaphores(parameters.philo_nb);
-	//system("leaks philo_two");
 	return (EXIT_SUCCESS);
 }

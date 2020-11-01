@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 15:39:58 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/11/01 08:45:24 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/01 10:40:15 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ static size_t	get_state_len(t_philo_state state)
 	return (7);
 }
 
-int			print_state(t_philo *philo, t_philo_state state)
+int				print_state(t_philo *philo, t_philo_state state)
 {
 	static int		sim_end = 0;
 	static t_time	time = 0;
