@@ -6,7 +6,7 @@
 #    By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/12/07 11:40:22 by fhenrion          #+#    #+#              #
-#    Updated: 2020/10/31 15:04:51 by fhenrion         ###   ########.fr        #
+#    Updated: 2020/11/01 11:01:23 by fhenrion         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,7 @@ $(NAME): $(SRC_O)
 	$(CC) -c $(CFLAGS) -I $(HDR_NAME) $< -o $@
 
 commit:
-	git add $(SRC) Makefile
+	git add $(SRC) ${HDR_NAME} Makefile
 	git commit -m 'makefile_commit'
 	git push
 
