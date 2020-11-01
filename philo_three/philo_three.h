@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 15:39:44 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/11/01 23:05:04 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/01 23:07:33 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,6 @@ void					*death_monitor(void *philo_void);
 void					philosopher(t_philo *philo);
 void					*eat_monitor(void *state_void);
 void					unlink_semaphores(const size_t philo_nb);
-char					*gen_name(const char *prefix, t_index i);
+char					*gen_name(const char *prefix, const t_index i);
 
 #endif
