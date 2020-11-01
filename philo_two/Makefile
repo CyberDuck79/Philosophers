@@ -6,19 +6,19 @@
 #    By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/12/07 11:40:22 by fhenrion          #+#    #+#              #
-#    Updated: 2020/10/23 18:19:04 by fhenrion         ###   ########.fr        #
+#    Updated: 2020/10/31 15:04:51 by fhenrion         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = philo_one
-HDR_NAME = philo_one.h
+NAME = philo_two
+HDR_NAME = philo_two.h
 
-SRC_NAME = philo_one time utils init print threads forks
+SRC_NAME = philo_two time utils init print threads semaphores
 SRC = $(addsuffix .c,$(SRC_NAME))
 SRC_O = $(addsuffix .o,$(SRC_NAME))
 
 CC = gcc
-CFLAGS = -Werror -Wall -Wextra
+CFLAGS = -Werror -Wall -Wextra -pthread
 
 .PHONY: clean fclean all re bonus
 
