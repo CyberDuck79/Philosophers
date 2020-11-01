@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 13:28:38 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/11/01 10:41:15 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/01 10:45:06 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ static t_error	launch_philo(t_data *state, const size_t philo_nb)
 			sem_post(state->philo[i].launch_flag_sem);
 			sem_wait(state->philo[i].launch_flag_sem);
 		}
-		sem_post(state->philo[i].launch_flag_sem);
 		if (state->philo[i].launch_flag == ERROR)
 			return (THREAD_ERROR);
 		i++;
