@@ -6,7 +6,7 @@
 #    By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/12/07 11:40:22 by fhenrion          #+#    #+#              #
-#    Updated: 2020/11/01 11:01:05 by fhenrion         ###   ########.fr        #
+#    Updated: 2020/11/04 15:17:32 by fhenrion         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,11 +25,11 @@ CFLAGS = -Werror -Wall -Wextra -pthread
 all: $(NAME)
 
 $(NAME): $(SRC_O)
-	$(CC) $(CFLAGS) -I $(HDR_NAME) $^ -o $@
+	$(CC) $(CFLAGS) -I . $^ -o $@
 	@echo "\033[0;32mCompilation OK\033[0m"
 
 %.o : %.c ${HDR_NAME}
-	$(CC) -c $(CFLAGS) -I $(HDR_NAME) $< -o $@
+	$(CC) -c $(CFLAGS) -I . $< -o $@
 
 commit:
 	git add $(SRC) ${HDR_NAME} Makefile
