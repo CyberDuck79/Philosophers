@@ -87,6 +87,7 @@ void		philosopher(t_philo *philo)
 	{
 		write(STDERR, "monitor creation error\n", 24);
 		sem_post(philo->launch_flag_sem);
+		sem_post(philo->death_sem);
 		exit(1);
 	}
 	pthread_detach(tid);
