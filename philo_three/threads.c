@@ -6,7 +6,7 @@
 /*   By: fhenrion <fhenrion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/22 12:38:15 by fhenrion          #+#    #+#             */
-/*   Updated: 2020/11/01 10:38:30 by fhenrion         ###   ########.fr       */
+/*   Updated: 2020/11/07 20:56:39 by fhenrion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ void		philosopher(t_philo *philo)
 		write(STDERR, "monitor creation error\n", 24);
 		sem_post(philo->launch_flag_sem);
 		sem_post(philo->death_sem);
-		exit(1);
+		sem_wait(philo->take_sem);
 	}
 	pthread_detach(tid);
 	sem_post(philo->launch_flag_sem);
